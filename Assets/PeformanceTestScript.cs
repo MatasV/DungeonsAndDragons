@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class PeformanceTestScript : MonoBehaviour
 {
+    [SerializeField]
     private int amountOfTilesZ;
+    [SerializeField]
     public int AmountOfTilesZ
     {
         get { return amountOfTilesZ; }
         set
         {
             amountOfTilesZ = value;
-            Debug.Log(generateTiles());
+            GenerateMap();
         }
     }
+    [SerializeField]
     private int amountOfTilesX;
+    [SerializeField]
     public int AmountOfTilesX
     {
         get
@@ -24,12 +28,32 @@ public class PeformanceTestScript : MonoBehaviour
         set
         {
             amountOfTilesX = value;
-            Debug.Log(generateTiles());
+            GenerateMap();
         }
     }
-    public bool generateTiles()
+
+    public Material materialToAdd;
+    void Start()
     {
-        bool Generated = false;
+        GenerateMap();
+    }
+    void ClearTiles()
+    {
+        Transform[] tiles;
+        tiles = GetComponentsInChildren<Transform>();
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            Destroy(tiles[i]);
+        }
+    }
+    public void CreateMap()
+    {
+        ClearTiles();
+        GenerateMap();
+    }
+    public void GenerateMap()
+    {
+       
 
         for (int i = 0; i < AmountOfTilesX; i++)
         {
@@ -37,13 +61,16 @@ public class PeformanceTestScript : MonoBehaviour
             {
                 GameObject MapObj = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 MeshRenderer renderer = MapObj.GetComponent<MeshRenderer>();
-                renderer.enabled = false;
+                //renderer.enabled = false;
                 MapObj.transform.SetParent(transform);
-                MapObj.transform.localScale = new Vector3(map.currentMap.size.x / mapScaleDownAmount, 1, map.currentMap.size.y / mapScaleDownAmount);
-                MapObj.transform.localRotation = Quaternion.Euler(0, 180, 0); // if I don't rotate, all maps face the other way around from the camera
-                MapObj.transform.localPosition = new Vector3(0, 0, 0);
+                MapObj.transform.localScale = new Vector3((float)1/(float)AmountOfTilesX, 1, (float)1 / (float)AmountOfTilesZ);
+                MapObj.gameObject.name = i + " : 0 :" + j;
+                MapObj.transform.localRotation = Quaternion.Euler(0, 0, 0); // if I don't rotate, all maps face the other way around from the camera
+                MapObj.transform.localPosition = new Vector3((float)10 / (float)AmountOfTilesZ * i, 0, (float)10 / (float)AmountOfTilesZ * j);
+                MapObj.GetComponent<MeshCollider>().convex = true;
+                renderer.material = materialToAdd;
             }
         }
-        return Generated;
+    
     }
 }
